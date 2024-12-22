@@ -1,0 +1,19 @@
+{
+  "name": "typeseverless",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "zeus": "npx graphql-zeus ./schema.docs.graphql ./"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2",
+    "graphql-zeus": "^7.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0"
+  }
+}
