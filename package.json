@@ -4,12 +4,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "zeus": "npx graphql-zeus ./schema.docs.graphql ./"
+    "zeus": "npx graphql-zeus ./schema.docs.graphql ./",
+    "start": "ts-node src/index.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "graphql-zeus": "^7.0.1"
   },

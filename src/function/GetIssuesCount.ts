@@ -3,8 +3,7 @@ import { IssueState } from "../zeus";
 
 export async function getIssuesCount(username: string, repoName: string) {
   try {
-    let issueCount;
-    const res = await chain("query")({
+    const issues = await chain("query")({
       user: [
         { login: username },
         {
@@ -19,14 +18,37 @@ export async function getIssuesCount(username: string, repoName: string) {
                   totalCount: true,
                 },
               ],
+              languages: [
+                { first: 10 }, // Fetch the first 10 languages
+                {
+                  edges: {
+                    node: {
+                      name: true,
+                      color: true,
+                    },
+                    size: true,
+                  },
+                },
+              ],
             },
           ],
         },
       ],
     });
-    issueCount = res.user?.repository?.issues.totalCount;
-    return issueCount;
+
+    const issueCount = issues.user?.repository?.issues.totalCount;
+    const techStack = issues.user?.repository?.languages?.edges?.map(
+      (edge: any) => ({
+        name: edge.node.name,
+        size: edge.size,
+      })
+    );
+    console.log(techStack);
+
+    return { issueCount, techStack };
   } catch (error) {
-    throw new Error(`Error fetching repository: ${error}`);
+    throw new Error(
+      `Error fetching issues or languages from repository: ${error}`
+    );
   }
 }

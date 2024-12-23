@@ -4,7 +4,7 @@ const app = express();
 const PORT = 3000;
 
 app.get("/", async (req: express.Request, res: express.Response) => {
-  const username = "HMaan0";
+  const username = "hkirat";
   try {
     const repos = await getRepos(username);
     res.json({

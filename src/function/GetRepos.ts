@@ -1,7 +1,12 @@
 import { RepositoryPrivacy } from "../zeus";
 import { chain } from "../lib/MakeChain";
 import { getIssuesCount } from "./GetIssuesCount";
-
+import { getPrCounts } from "./GetPrCounts";
+interface RepoPrs {
+  openPrs: number | undefined;
+  closedPrs: number | undefined;
+  mergedPrs: number | undefined;
+}
 export async function getRepos(username: string) {
   try {
     let hasNextPage = true;
@@ -28,6 +33,17 @@ export async function getRepos(username: string) {
                   owner: {
                     login: true,
                   },
+                  defaultBranchRef: {
+                    name: true,
+                    target: {
+                      __typename: true,
+                      "... on Commit": {
+                        history: {
+                          totalCount: true,
+                        },
+                      },
+                    },
+                  },
                 },
                 pageInfo: {
                   hasNextPage: true,
@@ -42,7 +58,6 @@ export async function getRepos(username: string) {
       if (res.user?.repositories?.nodes) {
         const nodes = res.user.repositories.nodes;
 
-        // Filter repositories owned by the user
         const ownedRepos = nodes.filter(
           (repo: any) => repo.owner?.login === username
         );
@@ -53,10 +68,16 @@ export async function getRepos(username: string) {
           if (typeof repo.name === "string" && repo.name.trim()) {
             try {
               const issues = await getIssuesCount(username, repo.name);
-              console.log(`${issues} issues in repository ${repo.name}`);
+              const totalCommits =
+                repo.defaultBranchRef?.target?.history?.totalCount || 0;
+              const totalContributors = repo.collaborators?.totalCount || 0;
+              const repoPrs = await getPrCounts(username, repo.name);
+              console.log(
+                `${issues} issues, ${totalCommits} commits, and ${totalContributors} contributors in repository ${repo.name} pullRequests ${repoPrs}`
+              );
             } catch (error) {
               console.error(
-                `Error fetching issues for repository ${repo.name}: ${error}`
+                `Error fetching issues, commits, or contributors for repository ${repo.name}: ${error}`
               );
             }
           } else {
