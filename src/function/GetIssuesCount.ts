@@ -19,7 +19,7 @@ export async function getIssuesCount(username: string, repoName: string) {
                 },
               ],
               languages: [
-                { first: 10 }, // Fetch the first 10 languages
+                { first: 10 },
                 {
                   edges: {
                     node: {
@@ -43,8 +43,6 @@ export async function getIssuesCount(username: string, repoName: string) {
         size: edge.size,
       })
     );
-    console.log(techStack);
-
     return { issueCount, techStack };
   } catch (error) {
     throw new Error(

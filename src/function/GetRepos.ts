@@ -2,16 +2,14 @@ import { RepositoryPrivacy } from "../zeus";
 import { chain } from "../lib/MakeChain";
 import { getIssuesCount } from "./GetIssuesCount";
 import { getPrCounts } from "./GetPrCounts";
-interface RepoPrs {
-  openPrs: number | undefined;
-  closedPrs: number | undefined;
-  mergedPrs: number | undefined;
-}
+import { getPrInfo } from "./GetPrInfo";
+
 export async function getRepos(username: string) {
   try {
     let hasNextPage = true;
     let endCursor = null;
     const allRepos: any[] = [];
+    const forkedRepos: any[] = [];
 
     while (hasNextPage) {
       const res: any = await chain("query")({
@@ -22,7 +20,6 @@ export async function getRepos(username: string) {
               {
                 first: 100,
                 after: endCursor,
-                isFork: false,
                 privacy: RepositoryPrivacy.PUBLIC,
               },
               {
@@ -30,6 +27,7 @@ export async function getRepos(username: string) {
                   name: true,
                   stargazerCount: true,
                   forkCount: true,
+                  isFork: true,
                   owner: {
                     login: true,
                   },
@@ -42,6 +40,12 @@ export async function getRepos(username: string) {
                           totalCount: true,
                         },
                       },
+                    },
+                  },
+                  parent: {
+                    name: true,
+                    owner: {
+                      login: true,
                     },
                   },
                 },
@@ -57,24 +61,66 @@ export async function getRepos(username: string) {
 
       if (res.user?.repositories?.nodes) {
         const nodes = res.user.repositories.nodes;
-
         const ownedRepos = nodes.filter(
           (repo: any) => repo.owner?.login === username
         );
+        const nonForkedRepos = ownedRepos.filter(
+          (repo: any) => repo.isFork === false
+        );
 
-        allRepos.push(...ownedRepos);
-
-        for (const repo of ownedRepos) {
+        const forkedReposList = ownedRepos.filter(
+          (repo: any) => repo.isFork === true
+        );
+        for (const repo of nonForkedRepos) {
           if (typeof repo.name === "string" && repo.name.trim()) {
             try {
               const issues = await getIssuesCount(username, repo.name);
               const totalCommits =
                 repo.defaultBranchRef?.target?.history?.totalCount || 0;
-              const totalContributors = repo.collaborators?.totalCount || 0;
+              const totalContributors = repo.collaborators?.totalCount;
               const repoPrs = await getPrCounts(username, repo.name);
-              console.log(
-                `${issues} issues, ${totalCommits} commits, and ${totalContributors} contributors in repository ${repo.name} pullRequests ${repoPrs}`
+
+              const repoData = {
+                ...repo,
+                issues,
+                prCounts: repoPrs,
+                totalCommits,
+                totalContributors,
+              };
+
+              allRepos.push(repoData);
+            } catch (error) {
+              console.error(
+                `Error fetching issues, commits, or contributors for repository ${repo.name}: ${error}`
               );
+            }
+          } else {
+            console.warn(`Invalid repository name: ${repo.name}`);
+          }
+        }
+
+        for (const repo of forkedReposList) {
+          if (typeof repo.name === "string" && repo.name.trim()) {
+            try {
+              const ownerWithName = {
+                name: repo.parent.name,
+                owner: repo.parent.owner.login,
+              };
+
+              const prInfo = await getPrInfo(ownerWithName, username);
+              const totalCommits =
+                repo.defaultBranchRef?.target?.history?.totalCount || 0;
+              // TODO: not showing collaborators
+              const totalContributors = repo.collaborators?.totalCount;
+
+              const repoData = {
+                ...repo,
+                totalCommits,
+                totalContributors,
+                prInfo,
+              };
+
+              forkedRepos.push(repoData);
             } catch (error) {
               console.error(
                 `Error fetching issues, commits, or contributors for repository ${repo.name}: ${error}`
@@ -91,7 +137,10 @@ export async function getRepos(username: string) {
       endCursor = pageInfo?.endCursor || null;
     }
 
-    return allRepos;
+    return {
+      allRepos,
+      forkedRepos,
+    };
   } catch (error) {
     throw new Error(`Error fetching repositories: ${error}`);
   }
