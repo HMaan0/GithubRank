@@ -61,12 +61,9 @@ export async function getPrInfo(
 
     const pullRequests = prInfo.search?.nodes || [];
     const parentRepoInfo = prInfo.repository;
-    console.log(parentRepoInfo);
 
     let pullRequestRepoInfo;
     for (const repoIssues of pullRequests) {
-      console.log(`repoIssues : ` + repoIssues);
-
       const issues = await getIssuesCount(
         nameWithOwner.owner,
         nameWithOwner.name

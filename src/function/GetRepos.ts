@@ -10,6 +10,7 @@ export async function getRepos(username: string) {
     let endCursor = null;
     const allRepos: any[] = [];
     const forkedRepos: any[] = [];
+    const collaboratedRepos: any[] = [];
 
     while (hasNextPage) {
       const res: any = await chain("query")({
@@ -55,6 +56,18 @@ export async function getRepos(username: string) {
                 },
               },
             ],
+            followers: [
+              {},
+              {
+                totalCount: true,
+              },
+            ],
+            following: [
+              {},
+              {
+                totalCount: true,
+              },
+            ],
           },
         ],
       });
@@ -63,6 +76,9 @@ export async function getRepos(username: string) {
         const nodes = res.user.repositories.nodes;
         const ownedRepos = nodes.filter(
           (repo: any) => repo.owner?.login === username
+        );
+        const collaboratedRepo = nodes.filter(
+          (repo: any) => repo.owner.login !== username
         );
         const nonForkedRepos = ownedRepos.filter(
           (repo: any) => repo.isFork === false
@@ -130,6 +146,38 @@ export async function getRepos(username: string) {
             console.warn(`Invalid repository name: ${repo.name}`);
           }
         }
+
+        for (const repo of collaboratedRepo) {
+          if (typeof repo.name === "string" && repo.name.trim()) {
+            try {
+              const ownerWithName = {
+                name: repo.name,
+                owner: repo.owner.login,
+              };
+
+              const prInfo = await getPrInfo(ownerWithName, username);
+              const totalCommits =
+                repo.defaultBranchRef?.target?.history?.totalCount || 0;
+              // TODO: not showing collaborators
+              const totalContributors = repo.collaborators?.totalCount;
+
+              const repoData = {
+                ...repo,
+                totalCommits,
+                totalContributors,
+                prInfo,
+              };
+
+              collaboratedRepos.push(repoData);
+            } catch (error) {
+              console.error(
+                `Error fetching issues, commits, or contributors for repository ${repo.name}: ${error}`
+              );
+            }
+          } else {
+            console.warn(`Invalid repository name: ${repo.name}`);
+          }
+        }
       }
 
       const pageInfo = res.user?.repositories?.pageInfo;
@@ -139,6 +187,7 @@ export async function getRepos(username: string) {
 
     return {
       allRepos,
+      collaboratedRepos,
       forkedRepos,
     };
   } catch (error) {

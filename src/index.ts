@@ -1,11 +1,11 @@
 import express from "express";
 import { getRepos } from "./function/GetRepos";
-import { getPrInfo } from "./function/GetPrInfo";
+import { chain } from "./lib/MakeChain";
 const app = express();
 const PORT = 3000;
 
 app.get("/", async (req: express.Request, res: express.Response) => {
-  const username = "RobinSuthar";
+  const username = "HMaan0";
   try {
     const repos = await getRepos(username);
     res.json({
@@ -20,15 +20,24 @@ app.get("/", async (req: express.Request, res: express.Response) => {
 
 app.get("/test", async (req: express.Request, res: express.Response) => {
   const username = "RobinSuthar";
-  const ownerWithName = {
-    name: "Wallpaper.io",
-    owner: "HMaan0",
-  };
   try {
-    const PRs = await getPrInfo(ownerWithName, username);
-
+    const followerInfo = await chain("query")({
+      user: [
+        {
+          login: username,
+        },
+        {
+          followers: [
+            {},
+            {
+              totalCount: true,
+            },
+          ],
+        },
+      ],
+    });
     res.json({
-      data: PRs,
+      data: "Working",
     });
   } catch (error) {
     res.json({
