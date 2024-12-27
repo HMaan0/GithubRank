@@ -1,6 +1,5 @@
 import express from "express";
 import { getRepos } from "./function/GetRepos";
-import { chain } from "./lib/MakeChain";
 const app = express();
 const PORT = 3000;
 
@@ -18,27 +17,24 @@ app.get("/", async (req: express.Request, res: express.Response) => {
   }
 });
 
-app.get("/test", async (req: express.Request, res: express.Response) => {
-  const username = "RobinSuthar";
+import { Request, Response } from "express";
+
+app.get("/test", (req: Request, res: Response) => {
   try {
-    const followerInfo = await chain("query")({
-      user: [
-        {
-          login: username,
-        },
-        {
-          followers: [
-            {},
-            {
-              totalCount: true,
-            },
-          ],
-        },
-      ],
-    });
-    res.json({
-      data: "Working",
-    });
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Transfer-Encoding", "chunked");
+    res.write('{"data":[');
+
+    let isFirst = true;
+    for (let i = 0; i < 10000; i++) {
+      if (!isFirst) {
+        res.write(",");
+      }
+      isFirst = false;
+      res.write(JSON.stringify(i));
+    }
+    res.write("]}");
+    res.end();
   } catch (error) {
     res.json({
       message: error,
