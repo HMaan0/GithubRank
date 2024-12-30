@@ -47,7 +47,7 @@ export async function getPrCounts(username: string, repoName: string) {
     const mergedPrs =
       mergedPullRequests.repository?.pullRequests.totalCount ?? 0;
 
-    return [`Open ${openPrs}`, `Merged ${mergedPrs}`, `Closed ${closedPrs}`];
+    return { Open: openPrs, Merged: mergedPrs, Closed: closedPrs };
   } catch (error) {
     throw new Error(`Error fetching issues from repository: ${error}`);
   }

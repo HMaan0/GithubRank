@@ -3,17 +3,18 @@ import { chain } from "../lib/MakeChain";
 import { getIssuesCount } from "./GetIssuesCount";
 import { getPrCounts } from "./GetPrCounts";
 import { getPrInfo } from "./GetPrInfo";
+import { GithubData } from "../types";
 
 export async function getRepos(username: string) {
   try {
     let hasNextPage = true;
     let endCursor = null;
-    const allRepos: any[] = [];
-    const forkedRepos: any[] = [];
-    const collaboratedRepos: any[] = [];
+    const allRepos = [];
+    const forkedRepos = [];
+    const collaboratedRepos = [];
 
     while (hasNextPage) {
-      const res: any = await chain("query")({
+      const githubData: GithubData = await chain("query")({
         user: [
           { login: username },
           {
@@ -72,28 +73,31 @@ export async function getRepos(username: string) {
         ],
       });
 
-      if (res.user?.repositories?.nodes) {
-        const nodes = res.user.repositories.nodes;
+      if (githubData.user?.repositories?.nodes) {
+        const nodes = githubData.user.repositories.nodes;
         const ownedRepos = nodes.filter(
-          (repo: any) => repo.owner?.login === username
+          (repo: { owner: { login: string } }) => repo.owner?.login === username
         );
         const collaboratedRepo = nodes.filter(
-          (repo: any) => repo.owner.login !== username
+          (repo: { owner: { login: string } }) => repo.owner.login !== username
         );
         const nonForkedRepos = ownedRepos.filter(
-          (repo: any) => repo.isFork === false
+          (repo: { isFork: string | boolean }) => repo.isFork === false
         );
 
         const forkedReposList = ownedRepos.filter(
-          (repo: any) => repo.isFork === true
+          (repo: { isFork: string | boolean }) => repo.isFork === true
         );
         for (const repo of nonForkedRepos) {
           if (typeof repo.name === "string" && repo.name.trim()) {
             try {
               const issues = await getIssuesCount(username, repo.name);
-              const totalCommits =
-                repo.defaultBranchRef?.target?.history?.totalCount || 0;
-              const totalContributors = repo.collaborators?.totalCount;
+              let totalCommits = 0;
+              if (repo.defaultBranchRef?.target?.__typename === "Commit") {
+                totalCommits =
+                  repo.defaultBranchRef.target.history?.totalCount || 0;
+              }
+              //const totalContributors = repo.collaborators?.totalCount;
               const repoPrs = await getPrCounts(username, repo.name);
 
               const repoData = {
@@ -101,7 +105,7 @@ export async function getRepos(username: string) {
                 issues,
                 prCounts: repoPrs,
                 totalCommits,
-                totalContributors,
+                //totalContributors,
               };
 
               allRepos.push(repoData);
@@ -116,7 +120,11 @@ export async function getRepos(username: string) {
         }
 
         for (const repo of forkedReposList) {
-          if (typeof repo.name === "string" && repo.name.trim()) {
+          if (
+            typeof repo.name === "string" &&
+            repo.name.trim() &&
+            repo.parent != null
+          ) {
             try {
               const ownerWithName = {
                 name: repo.parent.name,
@@ -124,15 +132,18 @@ export async function getRepos(username: string) {
               };
 
               const prInfo = await getPrInfo(ownerWithName, username);
-              const totalCommits =
-                repo.defaultBranchRef?.target?.history?.totalCount || 0;
+              let totalCommits = 0;
+              if (repo.defaultBranchRef?.target?.__typename === "Commit") {
+                totalCommits =
+                  repo.defaultBranchRef.target.history?.totalCount || 0;
+              }
               // TODO: not showing collaborators
-              const totalContributors = repo.collaborators?.totalCount;
+              //const totalContributors = repo.collaborators?.totalCount;
 
               const repoData = {
                 ...repo,
                 totalCommits,
-                totalContributors,
+                //totalContributors,
                 prInfo,
               };
 
@@ -156,15 +167,18 @@ export async function getRepos(username: string) {
               };
 
               const prInfo = await getPrInfo(ownerWithName, username);
-              const totalCommits =
-                repo.defaultBranchRef?.target?.history?.totalCount || 0;
+              let totalCommits = 0;
+              if (repo.defaultBranchRef?.target?.__typename === "Commit") {
+                totalCommits =
+                  repo.defaultBranchRef.target.history?.totalCount || 0;
+              }
               // TODO: not showing collaborators
-              const totalContributors = repo.collaborators?.totalCount;
+              //const totalContributors = repo.collaborators?.totalCount;
 
               const repoData = {
                 ...repo,
                 totalCommits,
-                totalContributors,
+                //totalContributors,
                 prInfo,
               };
 
@@ -180,7 +194,7 @@ export async function getRepos(username: string) {
         }
       }
 
-      const pageInfo = res.user?.repositories?.pageInfo;
+      const pageInfo = githubData.user?.repositories?.pageInfo;
       hasNextPage = pageInfo?.hasNextPage || false;
       endCursor = pageInfo?.endCursor || null;
     }

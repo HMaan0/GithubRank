@@ -1,6 +1,5 @@
 import { chain } from "../lib/MakeChain";
 import { IssueState } from "../zeus";
-
 export async function getIssuesCount(username: string, repoName: string) {
   try {
     const issues = await chain("query")({
@@ -38,7 +37,7 @@ export async function getIssuesCount(username: string, repoName: string) {
 
     const issueCount = issues.user?.repository?.issues.totalCount;
     const techStack = issues.user?.repository?.languages?.edges?.map(
-      (edge: any) => ({
+      (edge) => ({
         name: edge.node.name,
         size: edge.size,
       })
