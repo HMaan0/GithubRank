@@ -158,3 +158,9 @@ type forkedRepos = {
     repoPrs: { Open: number; Merged: number; Closed: number }[];
   };
 };
+
+type Response = {
+  AllRepos: allRepos;
+  CollaboratedRepos: collaboratedRepos;
+  ForkedRepos: forkedRepos;
+}[];
