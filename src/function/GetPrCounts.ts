@@ -49,6 +49,8 @@ export async function getPrCounts(username: string, repoName: string) {
 
     return { Open: openPrs, Merged: mergedPrs, Closed: closedPrs };
   } catch (error) {
-    throw new Error(`Error fetching issues from repository: ${error}`);
+    throw new Error(
+      `Error fetching Pull requests number from repository: ${error}`
+    );
   }
 }

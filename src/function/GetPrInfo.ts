@@ -59,27 +59,33 @@ export async function getPrInfo(
       ],
     });
 
-    const pullRequests = prInfo.search?.nodes || [];
-    const parentRepoInfo = prInfo.repository;
+    const pullRequests = prInfo?.search?.nodes || [];
+    const parentRepoInfo = prInfo?.repository;
 
     let pullRequestRepoInfo;
-    for (const repoIssues of pullRequests) {
-      const issues = await getIssuesCount(
-        nameWithOwner.owner,
-        nameWithOwner.name
-      );
-      const repoPrs = await getPrCounts(
-        nameWithOwner.owner,
-        nameWithOwner.name
-      );
+    const issues = await getIssuesCount(
+      nameWithOwner.owner,
+      nameWithOwner.name
+    );
+    const repoPrs = await getPrCounts(nameWithOwner.owner, nameWithOwner.name);
+    if (prInfo) {
+      for (const repoIssues of pullRequests) {
+        pullRequestRepoInfo = {
+          parentRepoInfo,
+          issues,
+          repoPrs,
+          ...pullRequests,
+        };
+      }
+    } else {
       pullRequestRepoInfo = {
         parentRepoInfo,
         issues,
         repoPrs,
-        ...pullRequests,
       };
     }
-    return pullRequestRepoInfo;
+
+    return { prInfo, issues, repoPrs };
   } catch (error) {
     throw new Error(`Error fetching pull request info: ${error}`);
   }

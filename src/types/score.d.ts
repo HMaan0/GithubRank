@@ -1,4 +1,4 @@
-export type allRepos = {
+export type allReposScore = {
   name: string;
   stargazerCount: number;
   forkCount: number;
@@ -25,11 +25,12 @@ export type allRepos = {
     }[];
   };
 
-  repoPrs: { Open: number; Merged: number; Closed: number };
+  prCounts: { Open: number; Merged: number; Closed: number };
   totalCommits: number;
-}[];
+};
 
-export type collaboratedRepos = {
+export type collaboratedRepoScore = {
+  prCounts: number;
   name: string;
   stargazerCount: number;
   forkCount: number;
@@ -51,8 +52,8 @@ export type collaboratedRepos = {
   totalCommits: number;
 
   prInfo: PrInfo;
-}[];
-export type forkedRepos = {
+};
+export type forkedReposScore = {
   name: string;
   stargazerCount: number;
   forkCount: number;
@@ -78,7 +79,7 @@ export type forkedRepos = {
   totalCommits: number;
 
   prInfo: PrInfo;
-}[];
+};
 
 export type APIResponse = {
   data: {

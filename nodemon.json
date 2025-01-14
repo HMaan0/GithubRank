@@ -1,0 +1,5 @@
+{
+  "watch": ["src/function/getScore.ts"],
+  "ext": "ts",
+  "exec": "ts-node src/function/getScore.ts"
+}
