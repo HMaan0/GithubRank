@@ -13,26 +13,26 @@ app.use(cors(corsPolicy));
 
 const cache: Record<string, any> = {};
 
-app.get("/:user", async (req: express.Request, res: express.Response) => {
-  const { user } = req.params;
-  if (cache[user]) {
-    console.log("Returning cached data");
+// app.get("/:user", async (req: express.Request, res: express.Response) => {
+//   const { user } = req.params;
+//   if (cache[user]) {
+//     console.log("Returning cached data");
 
-    res.json({
-      data: cache[user],
-    });
-    return;
-  }
+//     res.json({
+//       data: cache[user],
+//     });
+//     return;
+//   }
 
-  try {
-    const repos = await getRepos(user);
-    res.json({
-      data: repos,
-    });
-  } catch (error) {
-    res.json({ message: "An error occurred" });
-  }
-});
+//   try {
+//     const repos = await getRepos(user);
+//     res.json({
+//       data: repos,
+//     });
+//   } catch (error) {
+//     res.json({ message: "An error occurred" });
+//   }
+// });
 
 app.get("/cache/:user", async (req: express.Request, res: express.Response) => {
   try {
@@ -52,17 +52,29 @@ app.get("/cache/:user", async (req: express.Request, res: express.Response) => {
   }
 });
 
-app.get("/", async (req: express.Request, res: express.Response) => {
-  const username = "HMaan0";
-  try {
-    const repos = await getRepos(username);
+app.get("/:user", async (req: express.Request, res: express.Response) => {
+  const { user } = req.params;
+  console.log(cache);
+
+  if (cache[user]) {
+    console.log("Returning cached data");
+
     res.json({
-      data: repos,
+      data: cache[user],
     });
-  } catch (error) {
-    res.json({
-      message: error,
-    });
+    return;
+  } else {
+    try {
+      const repos = await getRepos(user);
+      cache[user] = repos;
+      res.json({
+        data: repos,
+      });
+    } catch (error) {
+      res.json({
+        message: error,
+      });
+    }
   }
 });
 

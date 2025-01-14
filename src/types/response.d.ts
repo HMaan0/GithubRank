@@ -25,7 +25,7 @@ export type allRepos = {
     }[];
   };
 
-  repoPrs: { Open: number; Merged: number; Closed: number };
+  prCounts: { Open: number; Merged: number; Closed: number };
   totalCommits: number;
 }[];
 
@@ -47,7 +47,12 @@ export type collaboratedRepos = {
     };
   };
 
-  parent: null;
+  parent: {
+    name: string;
+    owner: {
+      login: string;
+    };
+  } | null;
   totalCommits: number;
 
   prInfo: PrInfo;
@@ -92,14 +97,14 @@ interface PrInfo {
   // this might cause unexpected issues
   prInfo: {
     repository: {
-      stargazerCount: 0;
-      forkCount: 0;
+      stargazerCount: number;
+      forkCount: number;
       defaultBranchRef: {
         name: string;
         target: {
-          __typename: "Commit";
+          __typename: string;
           history: {
-            totalCount: 14;
+            totalCount: number;
           };
         };
       };
@@ -109,7 +114,7 @@ interface PrInfo {
     };
   };
   issues: {
-    issueCount: 0;
+    issueCount: number;
     techStack: {
       name: string;
       size: number;
