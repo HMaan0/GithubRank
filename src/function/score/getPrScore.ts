@@ -1,7 +1,6 @@
 import { Nodes } from "../../types/score";
 
 export function getPrScore(prNodes: Nodes, RepoPrScore: number, score: number) {
-  console.log("initial score " + RepoPrScore);
   for (let i = 0; i < prNodes.length; i++) {
     RepoPrScore += prNodes[i].additions;
 
@@ -11,8 +10,6 @@ export function getPrScore(prNodes: Nodes, RepoPrScore: number, score: number) {
     RepoPrScore +=
       prNodes[i].deletions === 0 ? 0 : Math.pow(prNodes[i].deletions, 1 / 3);
 
-    console.log(RepoPrScore);
-
     if (
       prNodes[i].mergeStateStatus === "UNKNOWN" ||
       prNodes[i].mergeStateStatus === "CLEAN"
@@ -21,7 +18,6 @@ export function getPrScore(prNodes: Nodes, RepoPrScore: number, score: number) {
     } else {
       Math.pow(RepoPrScore, 1 / 2);
     }
-    console.log(RepoPrScore);
 
     if (prNodes[i].state === "MERGED") {
       RepoPrScore += 1;
@@ -36,7 +32,6 @@ export function getPrScore(prNodes: Nodes, RepoPrScore: number, score: number) {
         const roundedDays = Math.floor(ageOfPrInDays);
         if (roundedDays > 0) {
           Math.pow(score, 1 / roundedDays);
-          console.log(`${prNodes[i].title}, number days: ${roundedDays}`);
         }
       }
     } else if (prNodes[i].state === "OPEN") {
@@ -44,7 +39,6 @@ export function getPrScore(prNodes: Nodes, RepoPrScore: number, score: number) {
     } else {
       RepoPrScore += Math.pow(RepoPrScore, 1 / 3);
     }
-    console.log(RepoPrScore);
   }
   return RepoPrScore;
 }

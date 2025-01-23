@@ -27,7 +27,7 @@ export type allRepos = {
 
   prCounts: { Open: number; Merged: number; Closed: number };
   totalCommits: number;
-};
+}[];
 
 export type collaboratedRepos = {
   name: string;
@@ -50,47 +50,8 @@ export type collaboratedRepos = {
   parent: null;
   totalCommits: number;
 
-  prInfo?: {
-    // this might cause unexpected issues
-    [key: number]: {
-      __typename: string;
-      title: string;
-      state: string;
-      createdAt: string;
-      mergedAt: string | null;
-      author: {
-        login: string;
-      };
-      number: number;
-      merged: boolean;
-      mergeStateStatus: string;
-      additions: number;
-      deletions: number;
-      changedFiles: number;
-    };
-    parentRepoInfo: {
-      stargazerCount: 0;
-      forkCount: 0;
-      defaultBranchRef: {
-        name: string;
-        target: {
-          __typename: "Commit";
-          history: {
-            totalCount: 14;
-          };
-        };
-      };
-    };
-    issues: {
-      issueCount: 0;
-      techStack: {
-        name: string;
-        size: number;
-      }[];
-    };
-    repoPrs: { Open: number; Merged: number; Closed: number }[];
-  };
-};
+  prInfo: PrInfo;
+}[];
 export type forkedRepos = {
   name: string;
   stargazerCount: number;
@@ -116,9 +77,49 @@ export type forkedRepos = {
   };
   totalCommits: number;
 
-  prInfo?: {
-    // this might cause unexpected issues
-    [key: number]: {
+  prInfo: PrInfo;
+}[];
+
+export type APIResponse = {
+  data: {
+    allRepos: allRepos;
+    collaboratedRepos: collaboratedRepos;
+    forkedRepos: forkedRepos;
+  };
+  score: number;
+};
+
+interface PrInfo {
+  prInfo: {
+    repository: {
+      stargazerCount: 0;
+      forkCount: 0;
+      defaultBranchRef: {
+        name: string;
+        target: {
+          __typename: string;
+          history: {
+            totalCount: number;
+          };
+        };
+      };
+    };
+    search: {
+      nodes: Nodes;
+    };
+  };
+  issues: {
+    issueCount: number;
+    techStack: {
+      name: string;
+      size: number;
+    }[];
+  };
+  repoPrs: { Open: number; Merged: number; Closed: number };
+}
+
+export type Nodes =
+  | {
       __typename: string;
       title: string;
       state: string;
@@ -133,33 +134,5 @@ export type forkedRepos = {
       additions: number;
       deletions: number;
       changedFiles: number;
-    };
-    parentRepoInfo: {
-      stargazerCount: 0;
-      forkCount: 0;
-      defaultBranchRef: {
-        name: string;
-        target: {
-          __typename: "Commit";
-          history: {
-            totalCount: 14;
-          };
-        };
-      };
-    };
-    issues: {
-      issueCount: 0;
-      techStack: {
-        name: string;
-        size: number;
-      }[];
-    };
-    repoPrs: { Open: number; Merged: number; Closed: number }[];
-  };
-};
-
-export type APIResponse = {
-  AllRepos: allRepos;
-  CollaboratedRepos: collaboratedRepos;
-  ForkedRepos: forkedRepos;
-}[];
+    }[]
+  | [];

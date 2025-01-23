@@ -85,16 +85,7 @@ export type forkedReposScore = {
   prInfo: PrInfo;
 };
 
-export type APIResponse = {
-  data: {
-    allRepos: allRepos;
-    collaboratedRepos: collaboratedRepos;
-    forkedRepos: forkedRepos;
-  };
-};
-
 interface PrInfo {
-  // this might cause unexpected issues
   prInfo: {
     repository: {
       stargazerCount: number;

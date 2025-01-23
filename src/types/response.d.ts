@@ -91,10 +91,10 @@ export type APIResponse = {
     collaboratedRepos: collaboratedRepos;
     forkedRepos: forkedRepos;
   };
+  score: number;
 };
 
 interface PrInfo {
-  // this might cause unexpected issues
   prInfo: {
     repository: {
       stargazerCount: number;

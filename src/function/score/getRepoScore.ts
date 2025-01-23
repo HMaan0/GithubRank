@@ -33,7 +33,6 @@ export function getRepoScore(
 
     const prNodes = currentNode.prInfo.prInfo.search.nodes;
     if (prNodes.length === 0) {
-      console.log("No prs for this repo " + currentNode.name);
     } else {
       RepoPrScore = getPrScore(prNodes, 0, score);
     }
