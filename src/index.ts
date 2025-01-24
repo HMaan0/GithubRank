@@ -3,11 +3,11 @@ import { getRepos } from "./function/GetRepos";
 import { getScore } from "./function/getScore";
 import cors from "cors";
 const app = express();
-const PORT = 3002;
+const PORT = 3000;
 
 const corsPolicy = {
-  origin: ["http://localhost:3000", "http://10.0.0.101:3000"],
-  methods: "GET, POST",
+  origin: process.env.ORIGIN_URL ? [process.env.ORIGIN_URL] : [],
+  methods: "GET",
 };
 app.use(cors(corsPolicy));
 app.get("/:user", async (req: express.Request, res: express.Response) => {

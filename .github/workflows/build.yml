@@ -1,0 +1,61 @@
+name: Build and deploy to Docker Hub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v2
+        with:
+          build-args: |
+            Header=${{ secrets.Header }}
+            ORIGIN_URL=${{ secrets.ORIGIN_URL }}
+          context: .
+          file: ./dockerfile
+          push: true
+          tags: harsh0maan/github_backend:latest
+        env:
+          Header: ${{ secrets.Header }}
+          ORIGIN_URL: ${{ secrets.ORIGIN_URL }}
+
+      - name: Verify Pushed Image
+        run: docker pull harsh0maan/github_backend:latest
+
+      - name: Deploy to Azure
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            echo "Stopping existing container..."
+            sudo docker stop github_backend || true
+
+            echo "Removing existing container..."
+            sudo docker rm github_backend || true
+
+            echo "Pruning unused Docker objects..."
+            yes | sudo docker system prune -a
+
+            echo "Pulling the latest Docker image..."
+            sudo docker pull harsh0maan/github_backend:latest
+
+            echo "Starting new container..."
+            sudo docker run -d --name github_backend -p 3000:3000 harsh0maan/github_backend:latest
+
+            echo "Checking container logs..."
+            sudo docker logs github_backend

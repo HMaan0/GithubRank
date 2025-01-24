@@ -5,8 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "zeus": "npx graphql-zeus ./schema.docs.graphql ./",
-    "start": "ts-node src/index.ts",
-    "nodemon": "nodemon --watch src/function/getScore.ts --exec \"ts-node src/function/getScore.ts\""
+    "ts-start": "ts-node src/index.ts",
+    "build": "tsc -b",
+    "prod-start": "set NODE_ENV=production && node dist/index.js"
   },
   "author": "",
   "license": "ISC",
