@@ -35,13 +35,19 @@ jobs:
       - name: Verify Pushed Image
         run: docker pull harsh0maan/github_backend:latest
 
-      - name: Debug SSH Key (Dangerous)
+      - name: Debug SSH Key Length
         run: |
-          echo "SSH Key: '${{ secrets.SSH_KEY }}'"
+          echo "Key length: $(echo '${{ secrets.SSH_PRIVATE_KEY }}' | wc -c)"
+
+      - name: Validate SSH Key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null && echo "Key is valid"
 
       - name: Deploy to Azure
         uses: appleboy/ssh-action@v0.1.2
         with:
+          debug: true
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
