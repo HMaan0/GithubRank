@@ -39,11 +39,11 @@ jobs:
         run: |
           echo "Key length: $(echo '${{ secrets.SSH_KEY }}' | wc -c)"
 
-      - name: Validate and Configure SSH Key
+      - name: Configure SSH Key
         run: |
-          mkdir -p ~/.ssh                       # Create the .ssh directory
+          mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa               # Set correct permissions
+          chmod 600 ~/.ssh/id_rsa
           ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null && echo "Key is valid"
 
       - name: Deploy to Azure
