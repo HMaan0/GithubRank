@@ -35,6 +35,11 @@ jobs:
       - name: Verify Pushed Image
         run: docker pull harsh0maan/github_backend:latest
 
+      - name: Add SSH Host Key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
       - name: Deploy to Azure
         uses: appleboy/ssh-action@v0.1.2
         with:
