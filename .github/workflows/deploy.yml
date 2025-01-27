@@ -37,7 +37,12 @@ jobs:
 
       - name: Debug SSH Key Length
         run: |
-          echo "Key length: $(echo '${{ secrets.SSH_KEY }}' | wc -c)"
+          if [ -n "${{ secrets.SSH_KEY }}" ]; then
+            echo "Key length: $(echo '${{ secrets.SSH_KEY }}' | wc -c)"
+          else
+            echo "SSH key is missing"
+            exit 1
+          fi
 
       - name: Configure SSH Key
         run: |
