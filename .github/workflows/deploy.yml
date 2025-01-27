@@ -37,11 +37,11 @@ jobs:
 
       - name: Debug SSH Key Length
         run: |
-          echo "Key length: $(echo '${{ secrets.SSH_PRIVATE_KEY }}' | wc -c)"
+          echo "Key length: $(echo '${{ secrets.SSH_KEY }}' | wc -c)"
 
       - name: Validate SSH Key
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null && echo "Key is valid"
 
       - name: Deploy to Azure
