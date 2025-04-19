@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 export const chain = Chain("https://api.github.com/graphql", {
   headers: {
-    authorization: `Bearer ${process.env.Header}`,
+    authorization: `token ${process.env.GITHUB_TOKEN}`,
     "Content-Type": "application/json",
   },
 });
