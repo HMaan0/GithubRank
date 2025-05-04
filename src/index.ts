@@ -3,7 +3,7 @@ import { getRepos } from "./function/GetRepos";
 import { getScore } from "./function/getScore";
 import cors from "cors";
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 const corsPolicy = {
   origin: process.env.ORIGIN_URL ? [process.env.ORIGIN_URL] : [],

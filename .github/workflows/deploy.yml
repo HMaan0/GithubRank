@@ -65,14 +65,8 @@ jobs:
             echo "Removing existing container..."
             sudo docker rm github_backend || true
 
-            echo "Pruning unused Docker objects..."
-            yes | sudo docker system prune -a
-
             echo "Pulling the latest Docker image..."
             sudo docker pull harsh0maan/github_backend:latest
 
             echo "Starting new container..."
-            sudo docker run -d --name github_backend -p 3000:3000 harsh0maan/github_backend:latest
-
-            echo "Checking container logs..."
-            sudo docker logs github_backend
+            sudo docker run -d --name github_backend --network my_network -p 3001:3001 harsh0maan/github_backend:latest
