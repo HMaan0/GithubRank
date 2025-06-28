@@ -18,8 +18,11 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Compiles ts to js
-        run: tsc -b
+      - name: Generate Prisma Client
+        run: npx prisma generate
         env:
           Header: ${{secrets.Header}}
-          ORIGIN_URL: ${{secrets.ORIGIN_URL}}
+          DATABASE_URL: ${{secrets.DATABASE_URL}}
+
+      - name: Compiles ts to js
+        run: tsc -b

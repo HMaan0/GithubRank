@@ -23,14 +23,18 @@ jobs:
         with:
           build-args: |
             Header=${{ secrets.Header }}
-            ORIGIN_URL=${{ secrets.ORIGIN_URL }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            REDIS_HOST=${{secrets.REDIS_HOST}}
+            REDIS_PORT=${{secrets.REDIS_PORT}}
           context: .
           file: ./dockerfile
           push: true
           tags: harsh0maan/github_backend:latest
         env:
           Header: ${{ secrets.Header }}
-          ORIGIN_URL: ${{ secrets.ORIGIN_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_HOST: ${{secrets.REDIS_HOST}}
+          REDIS_PORT: ${{secrets.REDIS_PORT}}
 
       - name: Verify Pushed Image
         run: docker pull harsh0maan/github_backend:latest

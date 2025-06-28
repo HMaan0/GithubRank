@@ -37,7 +37,8 @@ export function getScore(
       }
     }
   } catch (error) {
-    return "error getting the score";
+    console.log(error);
+    return 0;
   } finally {
     return score + prScore;
   }
