@@ -15,6 +15,7 @@ WORKDIR /src
 COPY package* . 
 COPY tsconfig.json . 
 COPY ./prisma . 
+COPY ./src/generated .
 
 RUN npm install
 RUN DATABASE_URL=${DATABASE_URL} npx prisma generate
