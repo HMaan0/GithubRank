@@ -1,6 +1,6 @@
+import { PrismaClient } from "../prisma/generated/prisma";
 import { getRepos } from "./function/GetRepos";
 import { getScore } from "./function/getScore";
-import { PrismaClient } from "./generated/prisma";
 import { createClient } from "redis";
 const client = createClient({
   socket: {
