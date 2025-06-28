@@ -12,15 +12,11 @@ ENV REDIS_PORT=${REDIS_PORT}
 
 WORKDIR /src
 
-COPY package* . 
-COPY tsconfig.json . 
-COPY ./prisma . 
-COPY ./src/generated .
+COPY . .
 
 RUN npm install
 RUN DATABASE_URL=${DATABASE_URL} npx prisma generate
 
-COPY . .
 
 RUN npm run build
 
