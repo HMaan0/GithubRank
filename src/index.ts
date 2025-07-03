@@ -28,7 +28,6 @@ async function main() {
               await client.connect();
             }
             const queueLength = await client.lLen("newUser");
-            console.log(queueLength);
             if (queueLength > 0) {
               const username = await client.rPop("newUser");
               if (username) {
