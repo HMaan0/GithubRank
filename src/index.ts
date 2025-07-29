@@ -11,7 +11,7 @@ const client = createClient({
 const prisma = new PrismaClient();
 async function main() {
   const BATCH_SIZE = 8;
-  const INTERVAL = 60 * 60 * 1000;
+  const INTERVAL = 60 * 60 * 1000 * 24;
   while (true) {
     const users = await prisma.users.findMany({
       select: { id: true, name: true },
